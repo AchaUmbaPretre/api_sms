@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",              // Important pour Node.js classique
+    "strict": true,
+    "esModuleInterop": true,           // Pour pouvoir utiliser import jwt from 'jsonwebtoken'
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",                // Dossier de sortie compilé
+    "rootDir": "./src",                // Dossier source avec tes .ts
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"]
+}

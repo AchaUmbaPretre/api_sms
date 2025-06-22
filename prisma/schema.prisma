@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  enseignant
+  eleve
+  parent
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  prenom        String
+  email         String   @unique
+  mot_de_passe  String
+  role          Role     @default(eleve)
+  date_creation DateTime @default(now())
+  eleve         Eleve?
+}
+
+model Eleve {
+  id_eleve            Int      @id @default(autoincrement())
+  date_naissance      DateTime
+  sexe                Sexe     @default(M)
+  adresse             String
+  annee_academique_id Int
+  user                User     @relation(fields: [userId], references: [id])
+  userId              Int      @unique
+  date_creation       DateTime @default(now())
+}
+
+model AnneeAcademique {
+  id_annee_academique Int      @id @default(autoincrement())
+  libelle             String
+  date_debut          DateTime
+  date_fin            DateTime
+  actif               Boolean
+  classe              Classe[]
+  date_creation       DateTime @default(now())
+}
+
+model Classe {
+  id_classe          Int              @id @default(autoincrement())
+  nom_classe         String
+  niveau             String
+  annee_academique   AnneeAcademique @relation(fields: [annee_academiqueId], references: [id_annee_academique])
+  annee_academiqueId Int
+}
+
+enum Sexe {
+  M
+  F
+}
