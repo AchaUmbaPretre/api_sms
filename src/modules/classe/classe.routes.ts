@@ -5,3 +5,5 @@ const router = Router();
 
 router.get('/', classeController.findAll);
 router.post('/', classeController.create);
+
+export default router;
