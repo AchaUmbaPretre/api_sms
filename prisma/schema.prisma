@@ -15,23 +15,67 @@ enum Role {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   prenom        String
-  email         String   @unique
+  email         String       @unique
   mot_de_passe  String
-  role          Role     @default(eleve)
-  date_creation DateTime @default(now())
+  role          Role         @default(eleve)
+  date_creation DateTime     @default(now())
   eleve         Eleve?
+  parents       Parents?
+  professeurs   Professeurs?
 }
 
 model Eleve {
-  id_eleve            Int      @id @default(autoincrement())
+  id_eleve            Int             @id @default(autoincrement())
   date_naissance      DateTime
-  sexe                Sexe     @default(M)
+  sexe                Sexe            @default(M)
   adresse             String
   annee_academique_id Int
-  user                User     @relation(fields: [userId], references: [id])
-  userId              Int      @unique
+  user                User            @relation(fields: [userId], references: [id])
+  userId              Int             @unique
+  date_creation       DateTime        @default(now())
+  eleves_parents      Eleves_parents?
+}
+
+model Parents {
+  id_parent      Int              @id @default(autoincrement())
+  user           User             @relation(fields: [userId], references: [id])
+  userId         Int              @unique
+  eleves_parents Eleves_parents[]
+}
+
+model Eleves_parents {
+  id_eleve_parent Int     @id @default(autoincrement())
+  eleve           Eleve   @relation(fields: [id_eleve], references: [id_eleve])
+  parents         Parents @relation(fields: [id_parent], references: [id_parent])
+  id_eleve        Int     @unique
+  id_parent       Int
+}
+
+model specialite {
+  id_specialite   Int     @id @default(autoincrement())
+  nom_specialite  String
+  professeurs     Professeurs?
+}
+
+model Professeurs {
+  id_professeur   Int     @id @default(autoincrement())
+  user            User    @relation(fields: [userId], references: [id])
+  userId          Int     @unique
+  specialite      specialite @relation(fields: [id_specialite], references: [id_specialite])
+  id_specialite   Int @unique
+  professeurs_matieres  Professeurs_matieres []
+}
+
+model Professeurs_matieres {
+  id_professeurs_matieres Int   @id @default(autoincrement())
+  professeurs             Professeurs @relation(fields: [id_professeur], references: [id_professeur])
+  id_professeur           Int
+  matieres                Matieres  @relation(fields: [id_matiere], references: [id_matiere])
+  id_matiere              Int
+  classe                  Classe    @relation(fields: [id_classe], references: [id_classe])
+  id_classe               Int
   date_creation       DateTime @default(now())
 }
 
@@ -46,11 +90,26 @@ model AnneeAcademique {
 }
 
 model Classe {
-  id_classe          Int              @id @default(autoincrement())
+  id_classe          Int             @id @default(autoincrement())
   nom_classe         String
   niveau             String
   annee_academique   AnneeAcademique @relation(fields: [annee_academiqueId], references: [id_annee_academique])
   annee_academiqueId Int
+  professeurs_matieres  Professeurs_matieres []
+
+}
+
+model Matieres {
+  id_matiere  Int    @id @default(autoincrement())
+  nom_matiere String
+  coefficient Int    @default(1)
+  professeurs_matieres  Professeurs_matieres []
+
+}
+
+model Periodes {
+  id_periode  Int    @id @default(autoincrement())
+  nom_periode String
 }
 
 enum Sexe {
