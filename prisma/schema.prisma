@@ -66,6 +66,9 @@ model specialite {
 
 model Professeurs {
   id_professeur        Int                    @id @default(autoincrement())
+  nom                  String
+  postnom              String
+  sexe                 Sexe            @default(M)
   userId               Int                    @unique
   id_specialite        Int                    @unique
   user                 User                   @relation(fields: [userId], references: [id])

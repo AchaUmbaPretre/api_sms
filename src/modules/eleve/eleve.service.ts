@@ -4,6 +4,8 @@ import { Role, Sexe } from '@prisma/client';
 
 interface CreateEleveWithAccountDTO {
   prenom: string;
+  nom: string;
+  postnom: string;
   email: string;
   motDePasse: string;
   date_naissance: Date;
@@ -23,6 +25,8 @@ export const eleveService = {
   async createWithAccount(data: CreateEleveWithAccountDTO) {
     const {
       prenom,
+      nom,
+      postnom,
       email,
       motDePasse,
       date_naissance,
@@ -32,41 +36,54 @@ export const eleveService = {
     } = data;
 
     try {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        throw new Error('Email déjà utilisé.');
+      }
+
       const hashedPassword = await authService.hashPassword(motDePasse);
 
-      return await prisma.user.create({
-        data: {
-          prenom,
-          email,
-          mot_de_passe: hashedPassword,
-          role: Role.eleve,
-          eleve: {
-            create: {
-              date_naissance,
-              sexe,
-              adresse,
-              annee_academique_id,
-            },
+      const result = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            prenom,
+            email,
+            mot_de_passe: hashedPassword,
+            role: Role.eleve,
           },
-        },
-        include: {
-          eleve: true,
-        },
+        });
+
+        const eleve = await tx.eleve.create({
+          data: {
+            nom,
+            postnom,
+            date_naissance,
+            sexe,
+            adresse,
+            annee_academique_id,
+            userId: user.id,
+          },
+        });
+
+        return {
+          ...user,
+          eleve,
+        };
       });
+
+      return result;
     } catch (error) {
       console.error('[EleveService][createWithAccount] Erreur:', error);
       throw new Error('Impossible de créer le compte élève');
     }
   },
 
-  // 🔹 Récupérer tous les élèves avec leur compte
   async findAll() {
     return await prisma.eleve.findMany({
       include: { user: true },
     });
   },
 
-  // 🔹 Récupérer un élève par ID
   async findById(id_eleve: number) {
     const eleve = await prisma.eleve.findUnique({
       where: { id_eleve },
@@ -80,7 +97,6 @@ export const eleveService = {
     return eleve;
   },
 
-  // 🔹 Mettre à jour un élève
   async update(id_eleve: number, data: UpdateEleveDTO) {
     try {
       return await prisma.eleve.update({
@@ -94,10 +110,8 @@ export const eleveService = {
     }
   },
 
-  // 🔹 Supprimer un élève (et son compte utilisateur)
   async delete(id_eleve: number) {
     try {
-      // On récupère l'élève pour supprimer aussi le user lié
       const eleve = await prisma.eleve.findUnique({
         where: { id_eleve },
         include: { user: true },
@@ -107,10 +121,8 @@ export const eleveService = {
         throw new Error("Élève introuvable");
       }
 
-      // Supprimer le user supprime aussi l'élève grâce à la relation
-      await prisma.user.delete({
-        where: { id: eleve.userId },
-      });
+      await prisma.eleve.delete({ where: { id_eleve } });
+      await prisma.user.delete({ where: { id: eleve.userId } });
 
     } catch (error) {
       console.error('[EleveService][delete] Erreur:', error);
