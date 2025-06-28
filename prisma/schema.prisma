@@ -32,25 +32,25 @@ model Eleve {
   sexe                Sexe            @default(M)
   adresse             String
   annee_academique_id Int
-  user                User            @relation(fields: [userId], references: [id])
   userId              Int             @unique
+  user                User            @relation(fields: [userId], references: [id])
   date_creation       DateTime        @default(now())
   eleves_parents      Eleves_parents?
 }
 
 model Parents {
   id_parent      Int              @id @default(autoincrement())
-  user           User             @relation(fields: [userId], references: [id])
   userId         Int              @unique
+  user           User             @relation(fields: [userId], references: [id])
   eleves_parents Eleves_parents[]
 }
 
 model Eleves_parents {
   id_eleve_parent Int     @id @default(autoincrement())
-  eleve           Eleve   @relation(fields: [id_eleve], references: [id_eleve])
-  parents         Parents @relation(fields: [id_parent], references: [id_parent])
   id_eleve        Int     @unique
   id_parent       Int
+  eleve           Eleve   @relation(fields: [id_eleve], references: [id_eleve])
+  parents         Parents @relation(fields: [id_parent], references: [id_parent])
 }
 
 model specialite {
@@ -60,23 +60,23 @@ model specialite {
 }
 
 model Professeurs {
-  id_professeur   Int     @id @default(autoincrement())
-  user            User    @relation(fields: [userId], references: [id])
-  userId          Int     @unique
-  specialite      specialite @relation(fields: [id_specialite], references: [id_specialite])
-  id_specialite   Int @unique
+  id_professeur   Int         @id @default(autoincrement())
+  userId          Int         @unique
+  id_specialite   Int         @unique
+  user            User        @relation(fields: [userId], references: [id])
+  specialite      specialite  @relation(fields: [id_specialite], references: [id_specialite])
   professeurs_matieres  Professeurs_matieres []
 }
 
 model Professeurs_matieres {
-  id_professeurs_matieres Int   @id @default(autoincrement())
-  professeurs             Professeurs @relation(fields: [id_professeur], references: [id_professeur])
+  id_professeurs_matieres Int         @id @default(autoincrement())
   id_professeur           Int
-  matieres                Matieres  @relation(fields: [id_matiere], references: [id_matiere])
   id_matiere              Int
-  classe                  Classe    @relation(fields: [id_classe], references: [id_classe])
   id_classe               Int
-  date_creation       DateTime @default(now())
+  professeurs             Professeurs @relation(fields: [id_professeur], references: [id_professeur])
+  matieres                Matieres    @relation(fields: [id_matiere], references: [id_matiere])
+  classe                  Classe      @relation(fields: [id_classe], references: [id_classe])
+  date_creation       DateTime        @default(now())
 }
 
 model AnneeAcademique {
@@ -93,10 +93,10 @@ model Classe {
   id_classe          Int             @id @default(autoincrement())
   nom_classe         String
   niveau             String
-  annee_academique   AnneeAcademique @relation(fields: [annee_academiqueId], references: [id_annee_academique])
   annee_academiqueId Int
+  annee_academique   AnneeAcademique @relation(fields: [annee_academiqueId], references: [id_annee_academique])
   professeurs_matieres  Professeurs_matieres []
-
+  date_creation       DateTime @default(now())
 }
 
 model Matieres {
