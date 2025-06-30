@@ -14,6 +14,11 @@ enum Role {
   parent
 }
 
+enum Sexe {
+  M
+  F
+}
+
 enum Niveau {
   primaire
   secondaire
@@ -25,6 +30,17 @@ enum TypeNote {
   EXAMEN           @map("Exam")
   TOTAL            @map("Total")
   REPECHAGE        @map("Repechage")
+}
+
+enum StatutPresence {
+  present
+  absent
+  justifie
+}
+
+enum Periode {
+  matin
+  apresMidi
 }
 
 model User {
@@ -52,6 +68,7 @@ model Eleve {
   date_creation       DateTime        @default(now())
   eleves_parents      Eleves_parents?
   notes               Notes[]
+  presences           Presences[]
 }
 
 model Parents {
@@ -130,33 +147,53 @@ model Classe {
 }
 
 model Matieres {
-  id_matiere            Int                    @id @default(autoincrement())
-  nom_matiere           String
-  coefficient           Int                    @default(1)
-  professeurs_matieres  Professeurs_matieres[]
-  notes                 Notes[]
+  id_matiere           Int                    @id @default(autoincrement())
+  nom_matiere          String
+  coefficient          Int                    @default(1)
+  professeurs_matieres Professeurs_matieres[]
+  notes                Notes[]
 }
 
 model Periodes {
-  id_periode  Int    @id @default(autoincrement())
+  id_periode  Int     @id @default(autoincrement())
   nom_periode String
   notes       Notes[]
 }
 
 model Notes {
-  id_note        Int       @id @default(autoincrement())
-  id_eleve       Int
-  id_matiere     Int
-  id_periode     Int
-  note           Int
-  type           TypeNote  @default(PREMIERE_PERIODE)
-  eleve          Eleve     @relation(fields: [id_eleve], references: [id_eleve])
-  matieres       Matieres  @relation(fields: [id_matiere], references: [id_matiere])
-  periodes       Periodes  @relation(fields: [id_periode], references: [id_periode])
-  date_creation  DateTime  @default(now())
+  id_note       Int      @id @default(autoincrement())
+  id_eleve      Int
+  id_matiere    Int
+  id_periode    Int
+  note          Int
+  type          TypeNote @default(PREMIERE_PERIODE)
+  eleve         Eleve    @relation(fields: [id_eleve], references: [id_eleve])
+  matieres      Matieres @relation(fields: [id_matiere], references: [id_matiere])
+  periodes      Periodes @relation(fields: [id_periode], references: [id_periode])
+  date_creation DateTime @default(now())
 }
 
-enum Sexe {
-  M
-  F
+model Absence_motifs {
+  id_absence_motifs Int         @id @default(autoincrement())
+  libelle           String
+  presences         Presences[]
+}
+
+model Presences {
+  id_presence       Int             @id @default(autoincrement())
+  id_eleve          Int
+  date_presence     DateTime
+  status            StatutPresence  @default(present)
+  id_absence_motifs Int?
+  periode           Periode         @default(matin)
+  created_by        Int
+  date_creation     DateTime        @default(now())
+  eleve             Eleve           @relation(fields: [id_eleve], references: [id_eleve])
+  absence_motifs    Absence_motifs? @relation(fields: [id_absence_motifs], references: [id_absence_motifs])
+}
+
+model Jours_feries {
+  id_jours_feries Int       @id @default(autoincrement())
+  date            DateTime      @unique
+  nom             String
 }

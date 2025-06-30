@@ -131,6 +131,51 @@ CREATE TABLE `Periodes` (
     PRIMARY KEY (`id_periode`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Notes` (
+    `id_note` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_eleve` INTEGER NOT NULL,
+    `id_matiere` INTEGER NOT NULL,
+    `id_periode` INTEGER NOT NULL,
+    `note` INTEGER NOT NULL,
+    `type` ENUM('1P', '2P', 'Exam', 'Total', 'Repechage') NOT NULL DEFAULT '1P',
+    `date_creation` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id_note`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Absence_motifs` (
+    `id_absence_motifs` INTEGER NOT NULL AUTO_INCREMENT,
+    `libelle` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id_absence_motifs`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Presences` (
+    `id_presence` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_eleve` INTEGER NOT NULL,
+    `date_presence` DATETIME(3) NOT NULL,
+    `status` ENUM('present', 'absent', 'justifie') NOT NULL DEFAULT 'present',
+    `id_absence_motifs` INTEGER NULL,
+    `periode` ENUM('matin', 'apresMidi') NOT NULL DEFAULT 'matin',
+    `created_by` INTEGER NOT NULL,
+    `date_creation` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id_presence`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Jours_feries` (
+    `id_jours_feries` INTEGER NOT NULL AUTO_INCREMENT,
+    `date` DATETIME(3) NOT NULL,
+    `nom` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `Jours_feries_date_key`(`date`),
+    PRIMARY KEY (`id_jours_feries`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Eleve` ADD CONSTRAINT `Eleve_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -163,3 +208,18 @@ ALTER TABLE `Classe` ADD CONSTRAINT `Classe_annee_academiqueId_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `Classe` ADD CONSTRAINT `Classe_id_filiere_fkey` FOREIGN KEY (`id_filiere`) REFERENCES `Filieres`(`id_filiere`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Notes` ADD CONSTRAINT `Notes_id_eleve_fkey` FOREIGN KEY (`id_eleve`) REFERENCES `Eleve`(`id_eleve`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Notes` ADD CONSTRAINT `Notes_id_matiere_fkey` FOREIGN KEY (`id_matiere`) REFERENCES `Matieres`(`id_matiere`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Notes` ADD CONSTRAINT `Notes_id_periode_fkey` FOREIGN KEY (`id_periode`) REFERENCES `Periodes`(`id_periode`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Presences` ADD CONSTRAINT `Presences_id_eleve_fkey` FOREIGN KEY (`id_eleve`) REFERENCES `Eleve`(`id_eleve`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Presences` ADD CONSTRAINT `Presences_id_absence_motifs_fkey` FOREIGN KEY (`id_absence_motifs`) REFERENCES `Absence_motifs`(`id_absence_motifs`) ON DELETE SET NULL ON UPDATE CASCADE;
