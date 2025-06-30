@@ -8,6 +8,8 @@ import anneeAcademRoutes from './modules/anneeAcademique/anneeAcademique.routes'
 import classeRoutes from './modules/classe/classe.routes';
 import matiereRoutes from './modules/matieres/matieres.routes'
 import profMatiereRoutes from './modules/professeursMatieres/professeursMatieres.routes';
+import notesRoutes from './modules/notes/notes.routes';
+
 const app = express();
 
 app.use(cors());
@@ -21,5 +23,6 @@ app.use('/api/anneeAcademique', anneeAcademRoutes);
 app.use('/api/classe', classeRoutes);
 app.use('/api/matiere', matiereRoutes);
 app.use('/api/professeur_matiere', profMatiereRoutes);
+app.use('/api/notes', notesRoutes);
 
 export default app;

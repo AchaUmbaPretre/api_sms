@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { notesService } from "./notes.service";
+import { notesService, periodeService } from "./notes.service";
 import { parse } from "dotenv";
 
 export const notesController = {
@@ -55,4 +55,26 @@ export const notesController = {
           next(error);
         }
       },
+}
+
+export const periodeController = {
+    async create(req:Request, res:Response, next: NextFunction) : Promise<void> {
+        try {
+            await periodeService.createdPeriode(req.body);
+            res.status(201).json({
+                message: 'La periode a été enregistée avec succes'
+            })
+        } catch (error) {
+            next(error)
+        }
+    },
+
+    async findAll(req: Request, res: Response, next: NextFunction) : Promise<void> {
+        try {
+            const periode = await periodeService.findAll();
+            res.status(200).json(periode)
+        } catch (error) {
+            next()
+        }
+    }
 }

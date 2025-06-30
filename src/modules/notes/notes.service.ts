@@ -74,7 +74,7 @@ export const notesService = {
 }
 
 export const periodeService = {
-    async createdNotes(data: CreatePeriodeDTO) {
+    async createdPeriode(data: CreatePeriodeDTO) {
         const {
             nom_periode
         } = data;
