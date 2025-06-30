@@ -14,6 +14,11 @@ interface CreateEleveWithAccountDTO {
   annee_academique_id: number;
 }
 
+interface CreateEleveParent {
+  id_eleve: number;
+  id_parent: number
+}
+
 interface UpdateEleveDTO {
   date_naissance?: Date;
   sexe?: Sexe;
@@ -127,6 +132,71 @@ export const eleveService = {
     } catch (error) {
       console.error('[EleveService][delete] Erreur:', error);
       throw new Error("Impossible de supprimer l’élève");
+    }
+  },
+};
+
+
+export const eleveParentService = {
+  async createWithAccount(data: CreateEleveParent) {
+    const { id_eleve, id_parent } = data;
+
+    try {
+        return await prisma.eleves_parents.create({
+            data: {
+                id_eleve,
+                id_parent
+            },
+        });
+
+    } catch (error) {
+      console.error('[EleveParentService][createWithAccount] Erreur :', error);
+      throw new Error('Impossible de créer le compte Eleve parent');
+    }
+  },
+
+  async findAll() {
+    return await prisma.eleves_parents.findMany();
+  },
+
+  async findById(id_eleve_parent: number) {
+    const elevesParents = await prisma.eleves_parents.findUnique({
+      where: { id_eleve_parent } });
+
+    if (!elevesParents) {
+      throw new Error('Eleves parents introuvable');
+    }
+
+    return elevesParents;
+  },
+
+  async update(id_eleve_parent: number, data: CreateEleveParent) {
+    try {
+      return await prisma.eleves_parents.update({
+        where: { id_eleve_parent },
+        data
+      });
+    } catch (error) {
+      console.error('[EleveParentService][update] Erreur :', error);
+      throw new Error("Impossible de mettre à jour l'eleve parent");
+    }
+  },
+
+  async delete(id_eleve_parent: number) {
+    try {
+      const eleveParent = await prisma.eleves_parents.findUnique({
+        where: { id_eleve_parent }
+      });
+
+      if (!eleveParent) {
+        throw new Error('Eleve parent introuvable');
+      }
+
+      await prisma.eleves_parents.delete({ where: { id_eleve_parent } });
+
+    } catch (error) {
+      console.error('[EleveParentService][delete] Erreur :', error);
+      throw new Error("Impossible de supprimer cette affectation");
     }
   },
 };

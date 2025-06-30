@@ -14,6 +14,19 @@ enum Role {
   parent
 }
 
+enum Niveau {
+  primaire
+  secondaire
+}
+
+enum TypeNote {
+  PREMIERE_PERIODE @map("1P")
+  DEUXIEME_PERIODE @map("2P")
+  EXAMEN           @map("Exam")
+  TOTAL            @map("Total")
+  REPECHAGE        @map("Repechage")
+}
+
 model User {
   id            Int          @id @default(autoincrement())
   prenom        String
@@ -38,13 +51,14 @@ model Eleve {
   user                User            @relation(fields: [userId], references: [id])
   date_creation       DateTime        @default(now())
   eleves_parents      Eleves_parents?
+  notes               Notes[]
 }
 
 model Parents {
   id_parent      Int              @id @default(autoincrement())
   nom            String
   postnom        String
-  sexe           Sexe            @default(M)
+  sexe           Sexe             @default(M)
   userId         Int              @unique
   user           User             @relation(fields: [userId], references: [id])
   eleves_parents Eleves_parents[]
@@ -68,7 +82,7 @@ model Professeurs {
   id_professeur        Int                    @id @default(autoincrement())
   nom                  String
   postnom              String
-  sexe                 Sexe            @default(M)
+  sexe                 Sexe                   @default(M)
   userId               Int                    @unique
   id_specialite        Int                    @unique
   user                 User                   @relation(fields: [userId], references: [id])
@@ -97,26 +111,49 @@ model AnneeAcademique {
   date_creation       DateTime @default(now())
 }
 
+model Filieres {
+  id_filiere  Int      @id @default(autoincrement())
+  nom_filiere String
+  classe      Classe[]
+}
+
 model Classe {
   id_classe            Int                    @id @default(autoincrement())
   nom_classe           String
-  niveau               String
+  niveau               Niveau                 @default(primaire)
   annee_academiqueId   Int
+  id_filiere           Int
   annee_academique     AnneeAcademique        @relation(fields: [annee_academiqueId], references: [id_annee_academique])
+  filieres             Filieres               @relation(fields: [id_filiere], references: [id_filiere])
   professeurs_matieres Professeurs_matieres[]
   date_creation        DateTime               @default(now())
 }
 
 model Matieres {
-  id_matiere           Int                    @id @default(autoincrement())
-  nom_matiere          String
-  coefficient          Int                    @default(1)
-  professeurs_matieres Professeurs_matieres[]
+  id_matiere            Int                    @id @default(autoincrement())
+  nom_matiere           String
+  coefficient           Int                    @default(1)
+  professeurs_matieres  Professeurs_matieres[]
+  notes                 Notes[]
 }
 
 model Periodes {
   id_periode  Int    @id @default(autoincrement())
   nom_periode String
+  notes       Notes[]
+}
+
+model Notes {
+  id_note        Int       @id @default(autoincrement())
+  id_eleve       Int
+  id_matiere     Int
+  id_periode     Int
+  note           Int
+  type           TypeNote  @default(PREMIERE_PERIODE)
+  eleve          Eleve     @relation(fields: [id_eleve], references: [id_eleve])
+  matieres       Matieres  @relation(fields: [id_matiere], references: [id_matiere])
+  periodes       Periodes  @relation(fields: [id_periode], references: [id_periode])
+  date_creation  DateTime  @default(now())
 }
 
 enum Sexe {
