@@ -66,27 +66,26 @@ export const presenceService = {
     });
   },
 
-async createJourFerie(data: CreateJourFeriesDTO) {
-  const parsedDate = new Date(data.date);
+  async createJourFerie(data: CreateJourFeriesDTO) {
+    const parsedDate = new Date(data.date);
 
-  const exists = await prisma.jours_feries.findUnique({
-    where: {
-      date: parsedDate,
-    },
-  });
+    const exists = await prisma.jours_feries.findUnique({
+      where: {
+        date: parsedDate,
+      },
+    });
 
-  if (exists) {
-    throw new Error(`Le jour férié du ${data.date} est déjà enregistré (${exists.nom}).`);
-  }
+    if (exists) {
+      throw new Error(`Le jour férié du ${data.date} est déjà enregistré (${exists.nom}).`);
+    }
 
-  return prisma.jours_feries.create({
-    data: {
-      date: parsedDate,
-      nom: data.nom,
-    },
-  });
-},
-
+    return prisma.jours_feries.create({
+      data: {
+        date: parsedDate,
+        nom: data.nom,
+      },
+    });
+  },
 
   async getPresencesParMois(id_eleve: number, annee: number, mois: number) {
     const start = new Date(annee, mois - 1, 1);
@@ -130,4 +129,39 @@ async createJourFerie(data: CreateJourFeriesDTO) {
       justifies,
     };
   },
+
+  async getPresencesParClasseEtMois(id_classe: number, annee: number, mois: number) {
+    // Début du mois
+    const debutMois = new Date(annee, mois - 1, 1);
+    // Fin du mois
+    const finMois = new Date(annee, mois, 0, 23, 59, 59, 999);
+
+    const presences = await prisma.presences.findMany({
+      where: {
+        eleve: {
+          id_classe: id_classe,
+        },
+        date_presence: {
+          gte: debutMois,
+          lte: finMois,
+        },
+      },
+      include: {
+        eleve: {
+          select: {
+            id_eleve: true,
+            nom: true,
+            postnom: true,
+          },
+        },
+        absence_motifs: true,
+      },
+      orderBy: {
+        date_presence: 'asc',
+      },
+    });
+
+    return presences;
+  },
+
 };

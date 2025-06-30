@@ -20,6 +20,7 @@ CREATE TABLE `Eleve` (
     `sexe` ENUM('M', 'F') NOT NULL DEFAULT 'M',
     `adresse` VARCHAR(191) NOT NULL,
     `annee_academique_id` INTEGER NOT NULL,
+    `id_classe` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
     `date_creation` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -178,6 +179,9 @@ CREATE TABLE `Jours_feries` (
 
 -- AddForeignKey
 ALTER TABLE `Eleve` ADD CONSTRAINT `Eleve_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Eleve` ADD CONSTRAINT `Eleve_id_classe_fkey` FOREIGN KEY (`id_classe`) REFERENCES `Classe`(`id_classe`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Parents` ADD CONSTRAINT `Parents_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

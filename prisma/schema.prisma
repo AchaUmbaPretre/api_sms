@@ -63,12 +63,14 @@ model Eleve {
   sexe                Sexe            @default(M)
   adresse             String
   annee_academique_id Int
+  id_classe           Int
   userId              Int             @unique
   user                User            @relation(fields: [userId], references: [id])
   date_creation       DateTime        @default(now())
   eleves_parents      Eleves_parents?
   notes               Notes[]
   presences           Presences[]
+  classe              Classe            @relation(fields: [id_classe],references: [id_classe])
 }
 
 model Parents {
@@ -143,6 +145,7 @@ model Classe {
   annee_academique     AnneeAcademique        @relation(fields: [annee_academiqueId], references: [id_annee_academique])
   filieres             Filieres               @relation(fields: [id_filiere], references: [id_filiere])
   professeurs_matieres Professeurs_matieres[]
+  eleve                 Eleve[]
   date_creation        DateTime               @default(now())
 }
 

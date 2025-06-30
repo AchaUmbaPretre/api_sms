@@ -61,5 +61,27 @@ export const presenceController = {
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }
+  },
+
+getPresencesParClasseEtMois: async (req: Request, res: Response) => {
+  try {
+    const id_classe = parseInt(req.params.id_classe);
+    const { annee, mois } = req.query;
+
+    if (!annee || !mois) {
+      return res.status(400).json({ error: 'annee et mois sont requis en query' });
+    }
+
+    const presences = await presenceService.getPresencesParClasseEtMois(
+      id_classe,
+      parseInt(annee as string),
+      parseInt(mois as string)
+    );
+
+    res.json(presences);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
+}
+
 };
