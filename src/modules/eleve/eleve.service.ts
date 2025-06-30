@@ -12,6 +12,7 @@ interface CreateEleveWithAccountDTO {
   sexe?: Sexe;
   adresse: string;
   annee_academique_id: number;
+  id_classe: number
 }
 
 interface CreateEleveParent {
@@ -38,6 +39,7 @@ export const eleveService = {
       sexe = 'M',
       adresse,
       annee_academique_id,
+      id_classe
     } = data;
 
     try {
@@ -66,6 +68,7 @@ export const eleveService = {
             sexe,
             adresse,
             annee_academique_id,
+            id_classe,
             userId: user.id,
           },
         });

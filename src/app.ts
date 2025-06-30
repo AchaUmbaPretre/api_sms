@@ -9,7 +9,7 @@ import classeRoutes from './modules/classe/classe.routes';
 import matiereRoutes from './modules/matieres/matieres.routes'
 import profMatiereRoutes from './modules/professeursMatieres/professeursMatieres.routes';
 import notesRoutes from './modules/notes/notes.routes';
-
+import presenceRoutes from './modules/presences/presences.routes'
 const app = express();
 
 app.use(cors());
@@ -24,5 +24,6 @@ app.use('/api/classe', classeRoutes);
 app.use('/api/matiere', matiereRoutes);
 app.use('/api/professeur_matiere', profMatiereRoutes);
 app.use('/api/notes', notesRoutes);
+app.use('/api/presence', presenceRoutes)
 
 export default app;

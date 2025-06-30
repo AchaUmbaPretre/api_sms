@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import { presenceService } from './presences.service';
-import { CreateAbsenceMotifSchema, CreateJourFerieSchema, CreatePresenceSchema } from './presences.validation';
+import {
+  CreateAbsenceMotifSchema,
+  CreateJourFerieSchema,
+  CreatePresenceSchema,
+} from './presences.validation';
 
 export const presenceController = {
-  async createPresence(req: Request, res: Response) {
+  createPresence: async (req: Request, res: Response) => {
     try {
       const validated = CreatePresenceSchema.parse(req.body);
       const presence = await presenceService.createPresence(validated);
@@ -13,7 +17,7 @@ export const presenceController = {
     }
   },
 
-  async createMotif(req: Request, res: Response) {
+  createMotif: async (req: Request, res: Response) => {
     try {
       const validated = CreateAbsenceMotifSchema.parse(req.body);
       const motif = await presenceService.createAbsenceMotif(validated);
@@ -23,7 +27,7 @@ export const presenceController = {
     }
   },
 
-  async createJourFerie(req: Request, res: Response) {
+  createJourFerie: async (req: Request, res: Response) => {
     try {
       const validated = CreateJourFerieSchema.parse(req.body);
       const jour = await presenceService.createJourFerie(validated);
@@ -33,13 +37,13 @@ export const presenceController = {
     }
   },
 
-  async getPresencesParMois(req: Request, res: Response) {
+  getPresencesParMois: async (req: Request, res: Response) => {
     try {
       const id_eleve = parseInt(req.params.id_eleve);
       const { annee, mois } = req.query;
 
       if (!annee || !mois) {
-        return res.status(400).json({ error: "annee et mois requis en query" });
+        return res.status(400).json({ error: 'annee et mois requis en query' });
       }
 
       const result = await presenceService.getPresencesParMois(
@@ -53,7 +57,7 @@ export const presenceController = {
     }
   },
 
-  async getStatistiquesParEleve(req: Request, res: Response) {
+  getStatistiquesParEleve: async (req: Request, res: Response) => {
     try {
       const id_eleve = parseInt(req.params.id_eleve);
       const result = await presenceService.getStatistiquesParEleve(id_eleve);
@@ -63,25 +67,24 @@ export const presenceController = {
     }
   },
 
-getPresencesParClasseEtMois: async (req: Request, res: Response) => {
-  try {
-    const id_classe = parseInt(req.params.id_classe);
-    const { annee, mois } = req.query;
+  getPresencesParClasseEtMois: async (req: Request, res: Response) => {
+    try {
+      const id_classe = parseInt(req.params.id_classe);
+      const { annee, mois } = req.query;
 
-    if (!annee || !mois) {
-      return res.status(400).json({ error: 'annee et mois sont requis en query' });
+      if (!annee || !mois) {
+        return res.status(400).json({ error: 'annee et mois sont requis en query' });
+      }
+
+      const presences = await presenceService.getPresencesParClasseEtMois(
+        id_classe,
+        parseInt(annee as string),
+        parseInt(mois as string)
+      );
+
+      res.json(presences);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
-
-    const presences = await presenceService.getPresencesParClasseEtMois(
-      id_classe,
-      parseInt(annee as string),
-      parseInt(mois as string)
-    );
-
-    res.json(presences);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
+  },
 };
